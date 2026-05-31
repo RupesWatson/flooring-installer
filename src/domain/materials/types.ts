@@ -5,6 +5,7 @@ export type MaterialType =
   | 'vinyl'
   | 'laminate'
   | 'lvt'
+  | 'engineered_wood'
   | 'wood'
   | 'underlay'
   | 'accessory'

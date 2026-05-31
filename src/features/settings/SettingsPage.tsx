@@ -5,7 +5,7 @@ import { Textarea } from '../../ui/Textarea'
 import { PageHeader } from '../../ui/PageHeader'
 import { PageSpinner } from '../../ui/Spinner'
 import { useSettings } from './useSettings'
-import { exportData, downloadExport, importData } from '../../data'
+import { exportData, downloadExport, importData, seedCatalogue, getSeedStats } from '../../data'
 import type { BusinessSettings } from '../../data'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -22,6 +22,11 @@ export function SettingsPage() {
   const [fields, setFields] = useState<BusinessSettings | null>(null)
   const [saved, setSaved] = useState(false)
   const [importMsg, setImportMsg] = useState('')
+  const [seeding, setSeeding] = useState(false)
+  const [seedProgress, setSeedProgress] = useState(0)
+  const [seedTotal, setSeedTotal] = useState(0)
+  const [seedResult, setSeedResult] = useState<{ added: number; skipped: number } | null>(null)
+  const seedStats = getSeedStats()
 
   useEffect(() => {
     if (settings && !fields) setFields({ ...settings })
@@ -39,6 +44,22 @@ export function SettingsPage() {
     await save(fields)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  async function handleSeed() {
+    setSeeding(true)
+    setSeedResult(null)
+    setSeedProgress(0)
+    setSeedTotal(seedStats.total)
+    try {
+      const result = await seedCatalogue((loaded, total) => {
+        setSeedProgress(loaded)
+        setSeedTotal(total)
+      })
+      setSeedResult(result)
+    } finally {
+      setSeeding(false)
+    }
   }
 
   async function handleExport() {
@@ -136,6 +157,30 @@ export function SettingsPage() {
               onChange={e => set(key, (parseFloat(e.target.value) || 0) / 100)} />
           ))}
         </div>
+      </Section>
+
+      <Section title="Seed catalogue">
+        <p className="text-sm text-gray-500">
+          Load {seedStats.total} representative UK flooring products into your catalogue
+          ({Object.entries(seedStats.byType).map(([t, n]) => `${n} ${t.replace('_', ' ')}`).join(', ')}).
+          Skips any SKU already in your catalogue — safe to run more than once.
+        </p>
+        <Button variant="secondary" onClick={handleSeed} disabled={seeding}>
+          {seeding ? `Loading… ${seedProgress} / ${seedTotal}` : `Load ${seedStats.total} seed products`}
+        </Button>
+        {seeding && seedTotal > 0 && (
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-[var(--color-brand)] h-2 rounded-full transition-all"
+              style={{ width: `${(seedProgress / seedTotal) * 100}%` }}
+            />
+          </div>
+        )}
+        {seedResult && (
+          <p className="text-sm text-green-600">
+            Done — {seedResult.added} products added{seedResult.skipped > 0 ? `, ${seedResult.skipped} already existed (skipped)` : ''}.
+          </p>
+        )}
       </Section>
 
       <Section title="Data">

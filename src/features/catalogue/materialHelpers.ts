@@ -2,13 +2,14 @@ import type { Material, SellingFormat, MaterialType } from '../../domain/materia
 import type { Badge } from '../../ui/Badge'
 
 export const MATERIAL_TYPE_LABELS: Record<MaterialType, string> = {
-  carpet:    'Carpet',
-  vinyl:     'Vinyl',
-  laminate:  'Laminate',
-  lvt:       'LVT',
-  wood:      'Wood',
-  underlay:  'Underlay',
-  accessory: 'Accessory',
+  carpet:          'Carpet',
+  vinyl:           'Vinyl',
+  laminate:        'Laminate',
+  lvt:             'LVT',
+  engineered_wood: 'Engineered Wood',
+  wood:            'Solid Wood',
+  underlay:        'Underlay',
+  accessory:       'Accessory',
 }
 
 export const SELLING_FORMAT_LABELS: Record<SellingFormat, string> = {
@@ -22,12 +23,13 @@ export const SELLING_FORMAT_LABELS: Record<SellingFormat, string> = {
 type BadgeColor = Parameters<typeof Badge>[0]['color']
 
 export const TYPE_COLORS: Record<MaterialType, BadgeColor> = {
-  carpet:    'blue',
-  vinyl:     'green',
-  laminate:  'amber',
-  lvt:       'purple',
-  wood:      'rose',
-  underlay:  'gray',
+  carpet:          'blue',
+  vinyl:           'green',
+  laminate:        'amber',
+  lvt:             'purple',
+  engineered_wood: 'rose',
+  wood:            'rose',
+  underlay:        'gray',
   accessory: 'gray',
 }
 
