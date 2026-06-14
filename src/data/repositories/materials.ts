@@ -6,7 +6,10 @@ import { newId } from '../utils'
 export function createMaterialsRepo(db: FlooringDb) {
   return {
     async getAll(): Promise<Material[]> {
-      return db.materials.orderBy('make').toArray()
+      // `make` is not a Dexie index, so sort in memory rather than via orderBy
+      // (orderBy on a non-indexed keyPath throws SchemaError).
+      const all = await db.materials.toArray()
+      return all.sort((a, b) => a.make.localeCompare(b.make))
     },
 
     async getByType(type: MaterialType): Promise<Material[]> {

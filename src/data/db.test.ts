@@ -147,6 +147,14 @@ describe('materialsRepo', () => {
     expect(found?.rollWidthMm).toBe(4000)
   })
 
+  it('getAll returns every material sorted by make (regression: make is not indexed)', async () => {
+    expect(await materials.getAll()).toEqual([]) // must not throw on empty store
+    await materials.create({ make: 'Xerox', range: 'B', sku: 'X1', type: 'carpet', sellingFormat: 'roll', unitPricePence: 1000, priceUnit: 'per_linear_m' })
+    await materials.create({ make: 'Acme', range: 'Y', sku: 'A1', type: 'laminate', sellingFormat: 'pack', coveragePerPackM2: 2.2, unitPricePence: 3000, priceUnit: 'per_pack' })
+    const all = await materials.getAll()
+    expect(all.map(m => m.make)).toEqual(['Acme', 'Xerox'])
+  })
+
   it('filters by type', async () => {
     await materials.create({ make: 'A', range: 'B', sku: 'C1', type: 'carpet', sellingFormat: 'roll', unitPricePence: 1000, priceUnit: 'per_linear_m' })
     await materials.create({ make: 'X', range: 'Y', sku: 'Z1', type: 'laminate', sellingFormat: 'pack', coveragePerPackM2: 2.2, unitPricePence: 3000, priceUnit: 'per_pack' })

@@ -26,6 +26,7 @@ export function SettingsPage() {
   const [seedProgress, setSeedProgress] = useState(0)
   const [seedTotal, setSeedTotal] = useState(0)
   const [seedResult, setSeedResult] = useState<{ added: number; skipped: number } | null>(null)
+  const [seedError, setSeedError] = useState('')
   const seedStats = getSeedStats()
 
   useEffect(() => {
@@ -49,6 +50,7 @@ export function SettingsPage() {
   async function handleSeed() {
     setSeeding(true)
     setSeedResult(null)
+    setSeedError('')
     setSeedProgress(0)
     setSeedTotal(seedStats.total)
     try {
@@ -57,6 +59,8 @@ export function SettingsPage() {
         setSeedTotal(total)
       })
       setSeedResult(result)
+    } catch (err) {
+      setSeedError(`Seeding failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
     } finally {
       setSeeding(false)
     }
@@ -181,6 +185,7 @@ export function SettingsPage() {
             Done — {seedResult.added} products added{seedResult.skipped > 0 ? `, ${seedResult.skipped} already existed (skipped)` : ''}.
           </p>
         )}
+        {seedError && <p className="text-sm text-red-600">{seedError}</p>}
       </Section>
 
       <Section title="Data">
